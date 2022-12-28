@@ -1,6 +1,6 @@
 from sensor.entity import artifact_entity,config_entity
 from sensor.exception import SensorException
-from sklearn.prepocessing import Pipeline
+from sklearn.pipeline import Pipeline
 from sensor.logger import logging
 from typing import Optional
 import os,sys 
@@ -25,7 +25,7 @@ class DataTransformation:
         except Exception as e:
             raise SensorException(e,sys)
 
-    @classmethod()
+    @classmethod
     def get_data_transformer_object(cls)->Pipeline:
         try:
             simple_imputer = SimpleImputer(strategy='constant', fill_value=0)
@@ -63,10 +63,10 @@ class DataTransformation:
             transformation_pipeline.fit(input_feature_train_df)
 
             #transforming input features    
-            target_feature_train_arr = transformation_pipeline.transform(input_feature_train_df)
-            target_feature_test_arr = transformation_pipeline.transform(input_feature_test_df)
+            input_feature_train_arr = transformation_pipeline.transform(input_feature_train_df)
+            input_feature_test_arr = transformation_pipeline.transform(input_feature_test_df)
 
-            smt = SMOTETomek(sampling_strategy="minority")
+            smt = SMOTETomek(random_state=42)
             logging.info(f"Before resampling in training set Input: {input_feature_train_arr.shape} Target:{target_feature_train_arr.shape}")
             input_feature_train_arr,target_feature_train_arr = smt.fit_resample(input_feature_train_arr,target_feature_train_arr)
             logging.info(f"After resampling in training set Input: {input_feature_train_arr.shape} Target:{target_feature_train_arr.shape}")
@@ -88,10 +88,10 @@ class DataTransformation:
             utils.save_object(file_path=self.data_transformation_config.target_encoder_path, obj=label_encoder)
 
             data_transformation_artifact = artifact_entity.DataTransformationArtifact(
-                transform_object_path= data_transformation_config.transform_object_path, 
-                transformed_train_path = data_transformation_config.transformed_train_path, 
-                transformed_test_path = data_transformation_config.transformed_test_path, 
-                target_encoder_path = data_transformation_config.target_encoder_path
+                transform_object_path= self.data_transformation_config.transform_object_path, 
+                transformed_train_path = self.data_transformation_config.transformed_train_path, 
+                transformed_test_path = self.data_transformation_config.transformed_test_path, 
+                target_encoder_path = self.data_transformation_config.target_encoder_path
                 )
             logging.info(f"Data transformation object {data_transformation_artifact}")
             return data_transformation_artifact
