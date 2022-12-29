@@ -3,6 +3,10 @@ import json
 import pandas as pd
 from sensor.config import mongo_client
 
+from dotenv import load_dotenv
+print(f"Loading environment variable from .env file")
+load_dotenv()
+
 DATABASE_NAME = 'aps'
 COLLECTION_NAME = 'sensor'
 DATABASE_FILE_PATH = '/config/workspace/aps_failure_training_set1.csv'
